@@ -690,7 +690,11 @@
          * iframe自适应高度
          */
         dialogApi.prototype.adjustHeight = function () {
-            var test, h;
+            var test, h
+
+            // BUG: IE自动累加高度
+            // 设置为0重新调整
+            this.$iframe.css({height: '0px'})
 
             try {
                 // 跨域测试
