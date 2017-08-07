@@ -14,7 +14,7 @@
         $(element).pagination('selectPage', 2, 100);
  */
 
-+(function($) {
++(function ($) {
     'use strict';
 
     // 默认高亮类
@@ -38,10 +38,12 @@
     Pagination.VERSION = '1.0.0';
     // 分页默认参数
     Pagination.DEFAULTS = {
+        //每页显示条数
+        pageSize: 10,
         // 总记录数
         items: 1,
         // 每页记录数
-        itemsOnPage: 1,
+        itemsOnPage: 10,
         // 总页数
         pages: 0,
         // 只显示页数区间
@@ -50,13 +52,17 @@
         edges: 1,
         // 当前页
         currentPage: 0,
+        //是否可以改变 pageSize
+        showSizeChanger: true,
         // 分页总码数字符, 默认不显示, show-是否显示, template 字符模板
-        pageStr: {show: false, template: ''},
+        pageStr: {
+            show: false,
+            template: ''
+        },
         lblPrev: '\u4e0a\u4e00\u9875', //上一页
         lblNext: '\u4e0b\u4e00\u9875', //下一页
         // 选中触发事件
-        onSelectPage: function () {
-        }
+        onSelectPage: function () {}
     };
 
     // 初始化
@@ -67,6 +73,7 @@
         this._setOption(options);
 
         $this.itemsOnPage = this.options.itemsOnPage;
+        $this.pageSize = this.options.pageSize;
         $this.items = this.options.items;
         $this.current = this.options.currentPage;
 
@@ -80,11 +87,12 @@
 
         // dom 渲染
         $this._render();
-
+        //新增加改变每页显示条目数。author ethan
+        $this._renderPageSize();
         // 绑定点击切换页码
         !!!inited && $this.$el.on('click', 'a[data-page]', function (e) {
             e.preventDefault();
-            $this.selectPage($(this).data('page'));
+            $this.selectPage($(this).data('page')); //新增pageSize
         });
     };
 
@@ -99,7 +107,11 @@
     };
 
     // 切换页码
+    // 新增pageSize
     Pagination.prototype.selectPage = function (pageIndex, pages) {
+        console.log(pageIndex)
+        console.log(pages)
+        console.log(this.pageSize)
         // 切换到设置页
         this.currentPage = pageIndex - 1;
         this.current = pageIndex;
@@ -107,20 +119,24 @@
         this.render(pages);
 
         // 触发切换选择函数
-        this.options.onSelectPage(pageIndex, this);
+        this.options.onSelectPage(pageIndex, this, this.pageSize);
         // 触发api接口
-        this.$el.trigger('select.ui.pagination', [pageIndex, this]);
+        this.$el.trigger('select.ui.pagination', [pageIndex, this, this.pageSize]);
     };
 
     Pagination.prototype._render = function () {
-        var o = this.options, interval = this._getInterval(), i;
+        var o = this.options,
+            interval = this._getInterval(),
+            i;
         // 清空dom
         this.$el.empty().prevAll().remove();
         if (this.pages <= 1) return;
 
         // 上一页,false时不显示，当前页-1，text为显示文字，true为自定义label
         //console.log('currentPage:'+ o.currentPage)
-        if (o.lblPrev && this.currentPage - 1 >= 0) this._append(this.currentPage - 1, {text: o.lblPrev}, true);
+        if (o.lblPrev && this.currentPage - 1 >= 0) this._append(this.currentPage - 1, {
+            text: o.lblPrev
+        }, true);
 
 
         // 左边首页显示边缘页数
@@ -153,10 +169,42 @@
 
         // 下一页,false时不显示，当前页+1，text为显示文字，true为自定义label
         //console.log(this.currentPage, this.pages)
-        if (o.lblNext && this.currentPage < this.pages - 1) this._append(this.currentPage + 1, {text: o.lblNext}, true);
+        if (o.lblNext && this.currentPage < this.pages - 1) this._append(this.currentPage + 1, {
+            text: o.lblNext
+        }, true);
 
         this.renderPageStr();
+
     };
+
+    //新增加改变每页显示条目数。author ethan
+    Pagination.prototype._renderPageSize = function () {
+        if (this.options.showSizeChanger && this.options.showSizeChanger) {
+            var that = this;
+            var id = "PageSize-selector-id-" + Math.ceil(Math.random() * 100000 + 100000);
+            var select =
+                '<div class="form-control" style="display: inline-block; width: auto;vertical-align: top;padding: 0;margin-left: 10px;border:none;">' +
+                '<select id="' + id + '" style="height: 25px;border-radius:3px;color:#999">' +
+                '<option value="10">每页 10 条</option>' +
+                '<option value="20">每页 20 条</option>' +
+                '<option value="30">每页 30 条</option>' +
+                '<option value="100">每页 100 条</option>' +
+                '</select>' +
+                '</div>';
+            that.$el.after(select);
+            // 绑定点击切换页码
+            $('#' + id).on('change', function (e) {
+                e.preventDefault();
+                that.itemsOnPage = this.value;
+                that.pageSize = this.value;
+                // 总页数
+                that.pages = Math.ceil(that.items / this.value) > 0 ? Math.ceil(that.items / this.value) : 1;
+                console.log('-->', Math.ceil(that.items / this.value));
+                console.log('-->', that.pages);
+                that.selectPage(1, null, this.value); //后端需求跳回第1页
+            });
+        }
+    }
 
     // 渲染总页码
     Pagination.prototype.renderPageStr = function () {
@@ -186,21 +234,24 @@
         return {
             start: Math.ceil(
                 // 当前页是否大于显示范围的一半
-                this.currentPage > this.halfDisplayed
-                    ? Math.max(
+                this.currentPage > this.halfDisplayed ?
+                Math.max(
                     // 从当前页-显示一半范围开始
                     Math.min(this.currentPage - this.halfDisplayed, (this.pages - this.options.displayedPages))
                     // 当前页小于一半且总页数小于显示范围，从第一页开始
                     , 0)
-                    // 从第一页开始
-                    : 0),
+                // 从第一页开始
+                :
+                0),
             end: Math.ceil(
                 // 当前页是否大于显示范围的一半
                 this.currentPage > this.halfDisplayed
-                    // 当前页+显示范围的一半
-                    ? Math.min(this.currentPage + this.halfDisplayed, this.pages)
-                    // 结束为最多显示，末页
-                    : Math.min(this.options.displayedPages, this.pages))
+                // 当前页+显示范围的一半
+                ?
+                Math.min(this.currentPage + this.halfDisplayed, this.pages)
+                // 结束为最多显示，末页
+                :
+                Math.min(this.options.displayedPages, this.pages))
         }
     };
 
@@ -209,20 +260,26 @@
     // opts 文本配置
     // islb 是否上一页下一页，是永不加active
     Pagination.prototype._append = function (pageIndex, opts, islb) {
-        var $this = this, item, options;
+        var $this = this,
+            item, options;
 
         // 判断首页，末页，常规页
         pageIndex = pageIndex < 0 ? 0 : (pageIndex < this.pages ? pageIndex : this.pages - 1);
-        options = $.extend({text: pageIndex + 1}, opts);
+        options = $.extend({
+            text: pageIndex + 1
+        }, opts);
 
         // console.log(pageIndex, this.currentPage, islb)
 
         // 判断当前页与非当前页
         item = (pageIndex == this.currentPage) ?
             // 当前页， 上一页下一页不加active类
-        '<li ' + (islb ? '' : 'class="' + active + '"') + '><a href="javascript:void(0);">' + (options.text) + '</a></li>'
+            '<li ' + (islb ? '' : 'class="' + active + '"') + '><a href="javascript:void(0);">' + (options.text) + '</a></li>'
             // 分当前页标识为可点击
-            : '<li><a href="#page-' + (pageIndex + 1) + '" data-page="' + (pageIndex + 1) + '">' + options.text + '</a></li>';
+            :
+            '<li><a href="#page-' + (pageIndex + 1) + '" data-page="' + (pageIndex + 1) + '">' + options.text + '</a></li>';
+
+        //console.log(item);
 
         $this.$el.append(item);
     };
