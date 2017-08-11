@@ -99,7 +99,7 @@
 
     //判断pageSize是否为默认的 [10 20 30 100 ]其中之一，如果不是就默认10
     Pagination.prototype._getDefaultItemsOnPage = function (value) {
-        let page = 10;
+        var page = 10;
         switch (parseInt(value)) {
             case 20:
                 page = 20;
