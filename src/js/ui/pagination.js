@@ -72,7 +72,8 @@
 
         this._setOption(options);
 
-        $this.itemsOnPage = this.options.itemsOnPage;
+        $this.itemsOnPage = $this._getDefaultItemsOnPage(this.options.itemsOnPage);
+
         $this.pageSize = this.options.pageSize;
         $this.items = this.options.items;
         $this.current = this.options.currentPage;
@@ -94,6 +95,26 @@
             e.preventDefault();
             $this.selectPage($(this).data('page')); //新增pageSize
         });
+    };
+
+    //判断pageSize是否为默认的 [10 20 30 100 ]其中之一，如果不是就默认10
+    Pagination.prototype._getDefaultItemsOnPage = function (value) {
+        let page = 10;
+        switch (parseInt(value)) {
+            case 20:
+                page = 20;
+                break;
+            case 30:
+                page = 30;
+                break;
+            case 100:
+                page = 100;
+                break;
+            default:
+                break;
+        }
+        console.log("DefaultItemsOnPage", page);
+        return page;
     };
 
     Pagination.prototype.init = function (options) {
@@ -130,7 +151,7 @@
             i;
         // 清空dom
         this.$el.empty().prevAll().remove();
-        if (this.pages <= 1) return;
+        //if (this.pages <= 1) return; //修改为不隐藏
 
         // 上一页,false时不显示，当前页-1，text为显示文字，true为自定义label
         //console.log('currentPage:'+ o.currentPage)
@@ -182,16 +203,20 @@
         if (this.options.showSizeChanger && this.options.showSizeChanger) {
             var that = this;
             var id = "PageSize-selector-id-" + Math.ceil(Math.random() * 100000 + 100000);
+
+            var item10 = (that.itemsOnPage == 10) ? '<option value="10" selected>每页 10 条</option>' : '<option value="10" >每页 10 条</option>';
+            var item20 = (that.itemsOnPage == 20) ? '<option value="20" selected>每页 20 条</option>' : '<option value="20" >每页 20 条</option>';
+            var item30 = (that.itemsOnPage == 30) ? '<option value="30" selected>每页 30 条</option>' : '<option value="30" >每页 30 条</option>';
+            var item100 = (that.itemsOnPage == 100) ? '<option value="100" selected>每页 100 条</option>' : '<option value="100" >每页 100 条</option>';
+
             var select =
                 '<div class="form-control" style="display: inline-block; width: auto;vertical-align: top;padding: 0;margin-left: 10px;border:none;">' +
                 '<select id="' + id + '" style="height: 25px;border-radius:3px;color:#999">' +
-                '<option value="10">每页 10 条</option>' +
-                '<option value="20">每页 20 条</option>' +
-                '<option value="30">每页 30 条</option>' +
-                '<option value="100">每页 100 条</option>' +
+                item10 + item20 + item30 + item100 +
                 '</select>' +
                 '</div>';
             that.$el.after(select);
+
             // 绑定点击切换页码
             $('#' + id).on('change', function (e) {
                 e.preventDefault();
@@ -199,8 +224,8 @@
                 that.pageSize = this.value;
                 // 总页数
                 that.pages = Math.ceil(that.items / this.value) > 0 ? Math.ceil(that.items / this.value) : 1;
-                console.log('-->', Math.ceil(that.items / this.value));
-                console.log('-->', that.pages);
+                //console.log('-->', Math.ceil(that.items / this.value));
+                //console.log('-->', that.pages);
                 that.selectPage(1, null, this.value); //后端需求跳回第1页
             });
         }

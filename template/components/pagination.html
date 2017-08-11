@@ -1,80 +1,76 @@
-{% extends "../_layout/components.html" %}
-{% block mainBody %}
+{% extends "../_layout/components.html" %} {% block mainBody %}
 <style>
-    pre{ white-space: pre}
-</style>
-    <section id="type" class="ui-section">
-        <h1>分页</h1>
-        <!-- 警告框结构 -->
-        <div class="section-content">
-            <h3>
-                <strong>结构</strong>
-            </h3>
+    pre {
+        white-space: pre
+    }
 
-            <div class="ui-example">
-                <p class="description">
-                    表格模板<code>_components/pagination.html</code>包括<code>expand</code>参数。
-                </p>
-                <br>
-                <code>expand</code>传入扩展的样式名
-                <br>
-                                <br>
-                <br>
-                {% import "_components/pagination.html" as pagination %}
-                {{ pagination.render('text-align-center') }}
-            </div>
-            <div class="ui-code">
+</style>
+<section id="type" class="ui-section">
+    <h1>分页</h1>
+    <!-- 警告框结构 -->
+    <div class="section-content">
+        <h3>
+            <strong>结构</strong>
+        </h3>
+
+        <div class="ui-example">
+            <p class="description">
+                表格模板<code>_components/pagination.html</code>包括<code>expand</code>参数。
+            </p>
+            <br>
+            <code>expand</code>传入扩展的样式名
+            <br>
+            <br>
+            <br> {% import "_components/pagination.html" as pagination %} {{ pagination.render('text-align-center') }}
+        </div>
+        <div class="ui-code">
             {% raw %}
-<pre>
+            <pre>
     <code>
 # 输出分页 #
 {% import "_components/pagination.html" as pagination %}
 {{ pagination.render('text-align-center') }}
     </code>
-</pre>
-    {% endraw %}
-            </div>
+</pre> {% endraw %}
         </div>
+    </div>
 
 
-        <div class="section-content">
-            <h3>
-                <strong>ajax模板</strong>
-            </h3>
+    <div class="section-content">
+        <h3>
+            <strong>ajax模板</strong>
+        </h3>
 
-            <div class="ui-example">
-                <p class="description">
-                    <code>title</code>、<code>btns</code>、<code>expand</code>
-                </p>
-                
-                {# 定义ajax方式 #}
-                {{ pagination.ajax() }}
+        <div class="ui-example">
+            <p class="description">
+                <code>title</code>、<code>btns</code>、<code>expand</code>
+            </p>
 
-            </div>
-            <div class="ui-code">
+            {# 定义ajax方式 #} {{ pagination.ajax() }}
+
+        </div>
+        <div class="ui-code">
             {% raw %}
-<pre>
+            <pre>
     <code>
 {{ pagination.ajax() }}
     </code>
-</pre>
-{% endraw %}
-            </div>
+</pre> {% endraw %}
         </div>
+    </div>
 
-    </section>
-{% endblock %}
-
-{% block js %}
+</section>
+{% endblock %} {% block js %}
 <!-- <script src="{{dist}}/js/ui/pagination.js"></script> -->
 <script>
-    $(function(){
-        function ajaxHandler(alertClose){
-            setTimeout(function(){
+    $(function () {
+        function ajaxHandler(alertClose) {
+            setTimeout(function () {
                 alert('aaa');
                 alertClose();
             }, 1000)
         }
     })
+
 </script>
 {% endblock %}
