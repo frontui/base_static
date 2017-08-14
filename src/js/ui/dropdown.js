@@ -165,7 +165,7 @@
 
         var isActive = $target.hasClass(active);
 
-        always === undefined && clearMenus(underfined,1);
+        always === undefined && clearMenus(undefined,1);
 
         if (!isActive) {
             $target.addClass(active);
