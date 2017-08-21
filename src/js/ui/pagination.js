@@ -62,7 +62,7 @@
         lblPrev: '\u4e0a\u4e00\u9875', //上一页
         lblNext: '\u4e0b\u4e00\u9875', //下一页
         // 选中触发事件
-        onSelectPage: function () {}
+        onSelectPage: function () { }
     };
 
     // 初始化
@@ -97,10 +97,13 @@
         });
     };
 
-    //判断pageSize是否为默认的 [10 20 30 100 ]其中之一，如果不是就默认10
+    //判断pageSize是否为默认的 [5,10 20 30 100 ]其中之一，如果不是就默认10
     Pagination.prototype._getDefaultItemsOnPage = function (value) {
         var page = 10;
         switch (parseInt(value)) {
+            case 5:
+                page = 5;
+                break;
             case 20:
                 page = 20;
                 break;
@@ -204,6 +207,7 @@
             var that = this;
             var id = "PageSize-selector-id-" + Math.ceil(Math.random() * 100000 + 100000);
 
+            var item5 = (that.itemsOnPage == 5) ? '<option value="5" selected>每页 5 条</option>' : '<option value="5" >每页 5 条</option>';
             var item10 = (that.itemsOnPage == 10) ? '<option value="10" selected>每页 10 条</option>' : '<option value="10" >每页 10 条</option>';
             var item20 = (that.itemsOnPage == 20) ? '<option value="20" selected>每页 20 条</option>' : '<option value="20" >每页 20 条</option>';
             var item30 = (that.itemsOnPage == 30) ? '<option value="30" selected>每页 30 条</option>' : '<option value="30" >每页 30 条</option>';
@@ -212,7 +216,7 @@
             var select =
                 '<div class="form-control" style="display: inline-block; width: auto;vertical-align: top;padding: 0;margin-left: 10px;border:none;">' +
                 '<select id="' + id + '" style="height: 25px;border-radius:3px;color:#999">' +
-                item10 + item20 + item30 + item100 +
+                item5 + item10 + item20 + item30 + item100 +
                 '</select>' +
                 '</div>';
             that.$el.after(select);
@@ -260,23 +264,23 @@
             start: Math.ceil(
                 // 当前页是否大于显示范围的一半
                 this.currentPage > this.halfDisplayed ?
-                Math.max(
-                    // 从当前页-显示一半范围开始
-                    Math.min(this.currentPage - this.halfDisplayed, (this.pages - this.options.displayedPages))
-                    // 当前页小于一半且总页数小于显示范围，从第一页开始
-                    , 0)
-                // 从第一页开始
-                :
-                0),
+                    Math.max(
+                        // 从当前页-显示一半范围开始
+                        Math.min(this.currentPage - this.halfDisplayed, (this.pages - this.options.displayedPages))
+                        // 当前页小于一半且总页数小于显示范围，从第一页开始
+                        , 0)
+                    // 从第一页开始
+                    :
+                    0),
             end: Math.ceil(
                 // 当前页是否大于显示范围的一半
                 this.currentPage > this.halfDisplayed
-                // 当前页+显示范围的一半
-                ?
-                Math.min(this.currentPage + this.halfDisplayed, this.pages)
-                // 结束为最多显示，末页
-                :
-                Math.min(this.options.displayedPages, this.pages))
+                    // 当前页+显示范围的一半
+                    ?
+                    Math.min(this.currentPage + this.halfDisplayed, this.pages)
+                    // 结束为最多显示，末页
+                    :
+                    Math.min(this.options.displayedPages, this.pages))
         }
     };
 
