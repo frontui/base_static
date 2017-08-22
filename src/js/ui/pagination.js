@@ -74,7 +74,7 @@
 
         $this.itemsOnPage = $this._getDefaultItemsOnPage(this.options.itemsOnPage);
 
-        $this.pageSize = this.options.pageSize;
+        $this.pageSize = $this.itemsOnPage;
         $this.items = this.options.items;
         $this.current = this.options.currentPage;
 
