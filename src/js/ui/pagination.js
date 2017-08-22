@@ -74,7 +74,7 @@
 
         $this.itemsOnPage = $this._getDefaultItemsOnPage(this.options.itemsOnPage);
 
-        $this.pageSize = $this.itemsOnPage;
+        $this.pageSize = $this.itemsOnPage;  //收复初始化时默认 10条的BUG
         $this.items = this.options.items;
         $this.current = this.options.currentPage;
 
